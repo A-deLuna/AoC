@@ -11,8 +11,12 @@ Forgot to make a copy of solution 1. It was very similar to the code for part 2.
 ## Things learnt
 
 ### Designated initializers
-The designated initializer syntax is pretty cool. Slowly my C++ feels more like Go. Or should I say,
-more like C, where Go borrows the syntax from?
+The new designated initializer syntax is pretty cool.
+```C++
+range r{.start = 0, .count = 1};
+```
+
+Slowly my C++ feels more like Go. Or, should I say more like C?
 
 ### `<print>` behavior
 Was a bit surprised to see that the `<print>` header can't print `std::vector`s by default.
@@ -37,3 +41,7 @@ Another thing that caught me off-guard was having to reset the input stream with
 after an error. We run into this when trying to parse the new lines and text after the last
 number in a line. It's not super intuitive but it sort of makes sense that input streams preserve state
 that allows callers to inspect the last error encountered when parsing.
+
+### Int types
+Got surprised by the input file containing numbers that don't fit in an `int`. Should get into the habit
+of using `int64_t` or defining a type alias.

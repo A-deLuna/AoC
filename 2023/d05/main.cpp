@@ -31,30 +31,48 @@ std::ostream &operator<<(std::ostream &o, std::vector<T> t) {
   return o << "}";
 }
 
+// Uses ranges to keep track of the original seeds, and all the transformations that occur
+// on them.
+// Mappings within <src>-to-<dst> are also represented as ranges. For every mapping we iterate
+// over all existing ranges of things. For the few ranges of things that overlap with the mapping
+// we transform the values inside of the overlapping section and create new ranges for tracking
+// non-overlapping sections separately.
+// The code performs these tranformations and splitting of ranges as the input file is parsed.
+// We can do this because the mappings are in order in the input file and we don't need them anymore
+// after we transform and split all ranges.
 int main() {
   std::string s;
+  // parse 'seeds:'
   std::cin >> s;
   std::vector<range> seeds;
   inttype n, m;
+  //read all the seed values.
   while (std::cin >> n >> m) {
     seeds.push_back(range{.start = n, .count = m});
   }
   std::cout << "parsed seeds:" << seeds << "\n";
+  // allow to keep reading from std::cin after the previous error made it stop.
   std::cin.clear();
+
   while (std::getline(std::cin, s)) {
     if (s == "\n")
       continue;
-
     std::cout << s << "\n";
+
     inttype from, to, count;
-    std::vector<range> newSeeds;
+    std::vector<range> newSeeds; // stores seeds after transformations.
+    
+    // read next set of transformations.
     while (std::cin >> to >> from >> count) {
       std::println("maps: {0}, {1}, {2}", from, to, count);
+
+      // Check if any of the transformations apply to our "seeds" ranges.
       for (int i = 0; i < seeds.size(); i++) {
         range other{.start = from, .count = count};
         if (seeds[i].intercepts(other)) {
           std::cout << "Seed " << seeds[i] << " intercepts " << other << "\n";
-          // if I have unmapped zone at the start
+          // There is a non-overlapping section at the beginning of the "seed".
+          // Create a new range out of the non-overlapping section.
           if (seeds[i].start < other.start) {
             auto r = range{.start = seeds[i].start,
                            .count = other.start - seeds[i].start};
@@ -62,7 +80,8 @@ int main() {
             seeds.push_back(r);
           }
 
-          // if I have unmapped zone at the end
+          // There is a non-overlapping section at the end of the "seed".
+          // Create a new range out of the non-overlapping section.
           if (other.end() < seeds[i].end()) {
             auto r = range{.start = other.end() + 1,
                            .count = seeds[i].end() - other.end()};
@@ -70,7 +89,7 @@ int main() {
             seeds.push_back(r);
           }
 
-          // Overlap
+          // Tranform the area that overlaps between the "seed" range and the mapping.
           inttype start = std::max(seeds[i].start, other.start);
           inttype end = std::min(seeds[i].end(), other.end());
           inttype diff = start - from;
@@ -78,18 +97,20 @@ int main() {
           std::cout << "adding range " << r << '\n';
           newSeeds.push_back(r);
 
-          // delete seed
+          // delete seed we processed.
           seeds[i] = {-1, -1};
         }
       }
     }
+    // Some of the seeds ranges were not transformed. Copy those over.
     for (auto r : seeds) {
       if (r.start != -1 && r.count != -1) {
         std::cout << "copying range " << r << '\n';
         newSeeds.push_back(r);
       }
     }
-    seeds = newSeeds;
+    // delete all the previous ranges.
+    seeds = std::move(newSeeds);
     std::cin.clear();
   }
 

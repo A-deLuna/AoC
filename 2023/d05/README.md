@@ -6,6 +6,12 @@ Took me a while to wrap my head around the logic for handling the different rang
 consider for a while that after splitting a range some sections still need to be considered by
 rules we haven't seen yet.
 
+After reading some solutions online seems like I did something a bit unusual. After the problem started 
+I peeked at the input file and noticed all the transformations are in order. My code doesn't store
+all the different mappings and their relationships. Instead I'm tranforming the original seeds into other
+elements on the fly as I'm parsing the file. Only storing the current state of the original seeds after
+applying all the transformations.
+
 Forgot to make a copy of solution 1. It was very similar to the code for part 2.
 
 ## Things learnt

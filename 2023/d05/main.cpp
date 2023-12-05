@@ -37,9 +37,9 @@ std::ostream &operator<<(std::ostream &o, std::vector<T> t) {
 // over all existing ranges of things. For the few ranges of things that overlap with the mapping
 // we transform the values inside of the overlapping section and create new ranges for tracking
 // non-overlapping sections separately.
-// The code performs these tranformations and splitting of ranges as the input file is parsed.
-// We can do this because the mappings are in order in the input file and we don't need them anymore
-// after we transform and split all ranges.
+// The code performs these tranformations and splitting of ranges on the fly as the input file is parsed.
+// We can do this because the mappings are in order in the input file and we don't need them
+// after transforming all the things.
 int main() {
   std::string s;
   // parse 'seeds:'
